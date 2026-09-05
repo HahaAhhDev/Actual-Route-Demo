@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actual Route</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="browser">
+        <div class="tab-bar" id="tabBar">
+            <div class="tab active" data-tab-id="1">
+                <span class="tab-title">New Tab</span>
+                <button class="tab-close" onclick="closeTab(1)">×</button>
+            </div>
+            <button class="new-tab-btn" onclick="newTab()">+</button>
+        </div>
+        
+        <div class="toolbar">
+            <button class="nav-btn" onclick="goBack()">←</button>
+            <button class="nav-btn" onclick="goForward()">→</button>
+            <button class="nav-btn" onclick="reload()">⟳</button>
+            
+            <div class="url-bar">
+                <span class="lock-icon">🔒</span>
+                <input type="text" id="urlInput" placeholder="Search or enter URL" onkeydown="handleUrlInput(event)">
+                <button class="bookmark-btn" onclick="toggleBookmark()">☆</button>
+            </div>
+            
+            <button class="nav-btn" onclick="exportSession()">Export</button>
+            <button class="nav-btn" onclick="importSession()">Import</button>
+        </div>
+        
+        <div class="content-area">
+            <iframe id="browserFrame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+        </div>
+        
+        <div class="status-bar">
+            <span id="statusText">Ready</span>
+            <span id="storageInfo">Storage: 0MB / 50MB</span>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+    <script src="wisp-client.js"></script>
+</body>
+</html>
