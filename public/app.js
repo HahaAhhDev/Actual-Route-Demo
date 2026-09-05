@@ -6,12 +6,16 @@ class Browser {
         this.bookmarks = JSON.parse(localStorage.getItem('ar_bookmarks') || '[]');
         this.history = JSON.parse(localStorage.getItem('ar_history') || '[]');
         this.sessionId = localStorage.getItem('ar_session');
-        
-        if (!this.sessionId) {
-            this.createSession();
-        }
+        this.storage = JSON.parse(localStorage.getItem('ar_storage') || '{}');
         
         this.init();
+    }
+    
+    async init() {
+        if (!this.sessionId) {
+            await this.createSession();
+        }
+        this.newTab();
     }
     
     async createSession() {
@@ -19,10 +23,6 @@ class Browser {
         const data = await response.json();
         this.sessionId = data.sessionId;
         localStorage.setItem('ar_session', this.sessionId);
-    }
-    
-    init() {
-        this.newTab();
     }
     
     newTab(url = 'about:blank') {
@@ -78,15 +78,15 @@ class Browser {
         }
         
         const proxiedUrl = `/proxy/${encodeURIComponent(url)}`;
-        document.getElementById('browserFrame').src = proxiedUrl;
-        document.getElementById('urlInput').value = url;
+        const frame = document.getElementById('browserFrame');
+        frame.src = proxiedUrl;
         
         tab.url = url;
         tab.title = url;
         tab.history.push(url);
         tab.historyIndex = tab.history.length - 1;
         
-        this.addHistory(url, tab.title);
+        this.addHistory(url, url);
         this.render();
         this.updateStatus('Loading ' + url);
     }
@@ -99,7 +99,6 @@ class Browser {
         const url = tab.history[tab.historyIndex];
         document.getElementById('browserFrame').src = `/proxy/${encodeURIComponent(url)}`;
         document.getElementById('urlInput').value = url;
-        this.updateStatus('Back to ' + url);
     }
     
     goForward() {
@@ -110,16 +109,11 @@ class Browser {
         const url = tab.history[tab.historyIndex];
         document.getElementById('browserFrame').src = `/proxy/${encodeURIComponent(url)}`;
         document.getElementById('urlInput').value = url;
-        this.updateStatus('Forward to ' + url);
     }
     
     reload() {
-        const tab = this.getCurrentTab();
-        if (!tab || !tab.url || tab.url === 'about:blank') return;
-        
         const frame = document.getElementById('browserFrame');
         frame.src = frame.src;
-        this.updateStatus('Reloading');
     }
     
     toggleBookmark() {
@@ -130,10 +124,8 @@ class Browser {
         
         if (existing !== -1) {
             this.bookmarks.splice(existing, 1);
-            this.updateStatus('Bookmark removed');
         } else {
             this.bookmarks.push({ url: tab.url, title: tab.title, date: Date.now() });
-            this.updateStatus('Bookmark added');
         }
         
         localStorage.setItem('ar_bookmarks', JSON.stringify(this.bookmarks));
@@ -149,9 +141,26 @@ class Browser {
     handleUrlInput(event) {
         if (event.key === 'Enter') {
             const url = event.target.value.trim();
-            if (url) {
-                this.navigate(url);
-            }
+            if (url) this.navigate(url);
+        }
+    }
+    
+    async syncStorage(key, value) {
+        this.storage[key] = value;
+        localStorage.setItem('ar_storage', JSON.stringify(this.storage));
+        
+        try {
+            await fetch('/api/session/storage/set', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sessionId: this.sessionId,
+                    key,
+                    value
+                })
+            });
+        } catch (e) {
+            // Server storage failed, local only
         }
     }
     
@@ -159,6 +168,7 @@ class Browser {
         const data = {
             bookmarks: this.bookmarks,
             history: this.history,
+            storage: this.storage,
             sessionId: this.sessionId,
             exportedAt: new Date().toISOString()
         };
@@ -170,8 +180,6 @@ class Browser {
         a.download = 'actual-route-session.json';
         a.click();
         URL.revokeObjectURL(url);
-        
-        this.updateStatus('Session exported');
     }
     
     importSession() {
@@ -186,9 +194,10 @@ class Browser {
                     const data = JSON.parse(event.target.result);
                     this.bookmarks = data.bookmarks || [];
                     this.history = data.history || [];
+                    this.storage = data.storage || {};
                     localStorage.setItem('ar_bookmarks', JSON.stringify(this.bookmarks));
                     localStorage.setItem('ar_history', JSON.stringify(this.history));
-                    this.updateStatus('Session imported');
+                    localStorage.setItem('ar_storage', JSON.stringify(this.storage));
                     this.render();
                 } catch (err) {
                     this.updateStatus('Import failed');
@@ -210,7 +219,6 @@ class Browser {
         this.tabs.forEach(tab => {
             const tabEl = document.createElement('div');
             tabEl.className = 'tab' + (tab.id === this.currentTabId ? ' active' : '');
-            tabEl.setAttribute('data-tab-id', tab.id);
             tabEl.onclick = () => this.switchTab(tab.id);
             
             const titleEl = document.createElement('span');
@@ -250,8 +258,9 @@ class Browser {
             bookmarkBtn.textContent = '☆';
         }
         
-        const storageUsed = (localStorage.length * 1024) / (1024 * 1024);
-        document.getElementById('storageInfo').textContent = `Storage: ${storageUsed.toFixed(2)}MB / 50MB`;
+        const storageSize = JSON.stringify(this.storage).length;
+        const storageMB = (storageSize / (1024 * 1024)).toFixed(2);
+        document.getElementById('storageInfo').textContent = `Storage: ${storageMB}MB / 50MB`;
     }
 }
 

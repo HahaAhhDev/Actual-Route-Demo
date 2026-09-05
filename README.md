@@ -13,6 +13,11 @@ A school proxy demo built on the Actual Route framework. Features a Chrome-like 
 - Session export/import as JSON
 - Storage quota display
 - Wisp client support
+- WebSocket proxy
+- localStorage sync
+- Cookie management
+- Redirect handling
+- HTML rewriting
 
 ## Installation
 
@@ -25,45 +30,13 @@ git clone https://github.com/hahaahhdev/actual-route.git
 mv actual-route actualroute
 
 npm install
-```
-
-## Quick Start
-
-```bash
+Quick Start
+bash
 node server.js
-```
+Open http://localhost:8080
 
-Open `http://localhost:8080`
+Configuration
+Edit ar.config.js to change proxy settings, session limits, and feature toggles.
 
-## Browser Features
-
-- Multiple tabs
-- Navigation (back/forward/reload)
-- Bookmark toggle
-- URL bar with search
-- Session export/import
-- Storage usage display
-
-## Configuration
-
-Edit `ar.config.js` to change proxy settings, session limits, and feature toggles.
-
-## Project Structure
-
-```
-actual-route-demo/
-├── server.js
-├── ar.config.js
-├── package.json
-├── public/
-│   ├── index.html
-│   ├── style.css
-│   ├── app.js
-│   ├── sw.js
-│   └── wisp-client.js
-└── actualroute/
-```
-
-## License
-
+License
 MIT

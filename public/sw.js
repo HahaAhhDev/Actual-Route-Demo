@@ -32,9 +32,7 @@ async function getSessionId() {
     const cache = await caches.open('ar-session');
     const cached = await cache.match('session-id');
     
-    if (cached) {
-        return cached.text();
-    }
+    if (cached) return cached.text();
     
     const response = await fetch('/api/session/create', { method: 'POST' });
     const data = await response.json();

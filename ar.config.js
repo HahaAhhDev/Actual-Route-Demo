@@ -17,7 +17,7 @@ module.exports = {
         tabs: true,
         import_export: true,
         cloudflare_bypass: false,
-        tls_spoofing: false,
+        tls_spoofing: true,
         onion_routing: false,
         logging: false
     },
@@ -33,11 +33,10 @@ module.exports = {
     bypass: {
         enabled: true,
         cloudflare: false,
-        tls_spoofing: false,
-        challenge_solver: 'automatic',
-        max_connections: 50,
+        tls_spoofing: true,
+        max_connections: 100,
         timeout: 20,
-        retry_attempts: 2
+        retry_attempts: 3
     },
     
     cache: {

@@ -26,6 +26,7 @@ body {
     background: #111;
     border-bottom: 1px solid #333;
     min-height: 44px;
+    overflow-x: auto;
 }
 
 .tab {
@@ -38,6 +39,8 @@ body {
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
+    min-width: 100px;
 }
 
 .tab.active {
@@ -66,6 +69,7 @@ body {
     cursor: pointer;
     padding: 4px 12px;
     border-radius: 6px;
+    flex-shrink: 0;
 }
 
 .new-tab-btn:hover {
@@ -90,6 +94,7 @@ body {
     cursor: pointer;
     font-size: 14px;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .nav-btn:hover {
@@ -125,6 +130,7 @@ body {
     color: #fff;
     font-size: 14px;
     outline: none;
+    min-width: 0;
 }
 
 .url-bar input::placeholder {

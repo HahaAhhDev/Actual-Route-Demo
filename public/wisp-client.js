@@ -3,6 +3,7 @@ class WispClient {
         this.url = url;
         this.socket = null;
         this.connected = false;
+        this.messageHandlers = [];
     }
     
     connect() {
@@ -22,6 +23,10 @@ class WispClient {
                 this.socket.onclose = () => {
                     this.connected = false;
                 };
+                
+                this.socket.onmessage = (event) => {
+                    this.messageHandlers.forEach(handler => handler(event.data));
+                };
             } catch (error) {
                 reject(error);
             }
@@ -29,22 +34,16 @@ class WispClient {
     }
     
     send(data) {
-        if (!this.connected) {
-            throw new Error('Wisp not connected');
-        }
+        if (!this.connected) throw new Error('Wisp not connected');
         this.socket.send(data);
     }
     
     onMessage(callback) {
-        if (this.socket) {
-            this.socket.onmessage = (event) => callback(event.data);
-        }
+        this.messageHandlers.push(callback);
     }
     
     close() {
-        if (this.socket) {
-            this.socket.close();
-        }
+        if (this.socket) this.socket.close();
     }
 }
 

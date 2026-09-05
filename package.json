@@ -1,12 +1,12 @@
 {
-    "name": "actual-route-demo",
-    "version": "1.0.0",
-    "description": "School proxy demo built on Actual Route framework",
-    "main": "server.js",
-    "scripts": {
-      "start": "node server.js"
-    },
-    "dependencies": {
-      "actual-route": "file:./actualroute"
-    }
+  "name": "actual-route-demo",
+  "version": "1.0.0",
+  "description": "School proxy demo built on Actual Route framework",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
   }
+}
